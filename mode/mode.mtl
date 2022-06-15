@@ -1,0 +1,18 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# �������ļ�:07.09.2020 09:39:59
+
+newmtl defaultMat
+	Ns 30.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.5500 0.5500 0.5500
+	#Kd 0.5500 0.5500 0.5500
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	# map_Ka E:\��ɽ\����\���\314�����������\tqcszy314_tex.jpg
+	# map_Kd E:\��ɽ\����\���\314�����������\tqcszy314_tex.jpg
+	map_Ka ./tqcszy314_tex.jpg
+	map_Kd ./tqcszy314_tex.jpg

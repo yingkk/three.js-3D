@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>FBX_Loader</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+
+<body>
+	<!-- Import maps polyfill -->
+	<!-- Remove this when import maps will be widely supported -->
+	<!-- <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script> -->
+
+	<script type="importmap">
+			{
+				"imports": {
+					"three": "./js/three.module.js"
+				}
+			}
+		</script>
+
+	<script type="module">
+
+		import * as THREE from 'three';
+
+		import { OrbitControls } from './js/OrbitControls.js';
+		import { FBXLoader } from './js/FBXLoader.js';
+		import { createMultiMaterialObject } from './js/SceneUtils.js';
+
+		let camera, scene, renderer, stats;
+
+		init();
+		animate();
+
+		function init() {
+
+			const container = document.createElement('div');
+			document.body.appendChild(container);
+
+			camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
+			camera.position.set(100, 100, 200);
+
+			const listener = new THREE.AudioListener();
+			camera.add(listener);
+
+			// //创建一个全局 audio 源
+			// const sound = new THREE.Audio(listener);
+
+			// // 加载一个 sound 并将其设置为 Audio 对象的缓冲区
+			// const audioLoader = new THREE.AudioLoader();
+			// audioLoader.load('./audio/home-hjh.mp3', function (buffer) {
+			// 	sound.setBuffer(buffer);
+			// 	sound.setLoop(true);
+			// 	sound.setVolume(0.5);
+			// 	sound.play();
+			// });
+
+			scene = new THREE.Scene();
+
+			// var pointLight = new THREE.PointLight(0xffffff);
+			// pointLight.position.set(100, 100, 100);
+			// scene.add(pointLight);
+
+			const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
+			hemiLight.position.set(0, 1, 0);
+			scene.add(hemiLight);
+
+			const dirLight = new THREE.DirectionalLight(0xffffff);
+			dirLight.position.set(0, 1, 0);
+			scene.add(dirLight);
+
+			// grid
+			// const gridHelper = new THREE.GridHelper( 28, 28, 0x303030, 0x303030 );
+			// scene.add( gridHelper );
+
+			// model
+			const loader = new FBXLoader();
+			const textureLoader = new THREE.TextureLoader();
+
+
+
+			loader.load('mode/scm.fbx', function (object) {
+				object.traverse(function (child) {
+					if (child instanceof THREE.Mesh) {
+						// child.material.map = textureLoader.load('img/SANCAI_Base_Color_1001.jpg')
+						// scene.add(child);
+						console.log(child)
+						let materials = [];
+						for (var i = 1; i < 35; i++) {
+							const texture = textureLoader.load(`/img/lambert2_Normal_OpenGL_10${i < 10 ? '0' : ''}${i}.jpg`)
+							const material = new THREE.MeshNormalMaterial({ normalMap: texture });
+							materials.push(material);
+						}
+
+						for (var i = 1; i < 35; i++) {
+							const texture = textureLoader.load(`/img/lambert2_Roughness_10${i < 10 ? '0' : ''}${i}.jpg`)
+							const material = new THREE.MeshLambertMaterial({ map: texture })
+							materials.push(material);
+						}
+
+						for (var i = 1; i < 20; i++) {
+							const texture = textureLoader.load(`/img/SANCAI_Base_Color_10${i < 10 ? '0' : ''}${i}.jpg`);
+							const material = new THREE.MeshBasicMaterial({ lightMap: texture })
+							materials.push(material);
+						}
+						console.log(materials)
+
+						// const mesh = createMultiMaterialObject(child.geometry, materials);
+						// scene.add(mesh);
+					}
+				})
+				scene.add(object);
+			});
+
+			renderer = new THREE.WebGLRenderer();
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			renderer.setClearColor('#AFAFAF');
+			container.appendChild(renderer.domElement);
+
+			const controls = new OrbitControls(camera, renderer.domElement);
+			controls.target.set(0, 12, 0);
+			controls.update();
+
+			window.addEventListener('resize', onWindowResize);
+
+		}
+
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+		}
+
+		function animate() {
+			requestAnimationFrame(animate);
+			renderer.render(scene, camera);
+		}
+
+	</script>
+
+</body>
+
+</html>
